@@ -1,0 +1,330 @@
+---
+const title = 'Flores Amarillas · Feliz día de la primavera';
+// escala relativa: el ramo se mide en % del ancho de la tarjeta, nunca en px
+const ramo = [
+  { escala: 0.82, giro: -14 },
+  { escala: 1.02, giro: -7 },
+  { escala: 1.18, giro: 0 },
+  { escala: 1.0, giro: 7 },
+  { escala: 0.8, giro: 14 },
+];
+---
+
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content="Envía y recibe flores amarillas. Feliz día de la primavera." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..800&family=Quicksand:wght@400..700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌼</text></svg>" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="clouds"><i></i><i></i><i></i></div>
+    <div class="hills"><span></span><span></span></div>
+  </div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <main>
+    <!-- ENVIAR -->
+    <section id="vista-enviar" class="card" hidden>
+      <p class="kicker">21 de septiembre</p>
+      <h1>Feliz día de la<br /><em>primavera</em></h1>
+      <p class="lead">Regalá flores amarillas. Completá los datos y compartí el link.</p>
+
+      <form id="form">
+        <label>
+          <span>De parte de</span>
+          <input name="de" required maxlength="40" placeholder="Tu nombre" autocomplete="name" />
+        </label>
+        <label>
+          <span>Para</span>
+          <input name="para" required maxlength="40" placeholder="Su nombre" />
+        </label>
+
+        <fieldset class="tipos">
+          <legend>¿Cómo se las enviás?</legend>
+          <label class="tipo">
+            <input type="radio" name="tipo" value="carino" checked />
+            <span>Con cariño <b>🌼</b></span>
+          </label>
+          <label class="tipo">
+            <input type="radio" name="tipo" value="amor" />
+            <span>Con amor <b>💛</b></span>
+          </label>
+        </fieldset>
+
+        <button class="btn" type="submit">Crear el ramo 🌻</button>
+      </form>
+
+      <div id="resultado" hidden>
+        <p class="ok">¡Ramo listo! Compartí este link:</p>
+        <div class="linkbox">
+          <input id="link" readonly />
+          <button class="btn mini" type="button" id="copiar">Copiar</button>
+        </div>
+        <div class="acciones">
+          <a class="btn ghost" id="wsp" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn ghost" id="ver">Ver cómo queda</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECIBIR -->
+    <section id="vista-recibir" class="card" hidden>
+      <p class="kicker">Alguien te mandó flores</p>
+      <h2 class="para">Para <span id="r-para"></span></h2>
+
+      <div class="ramo" aria-label="Ramo de flores amarillas">
+        {ramo.map((f, i) => (
+          <svg class="f" viewBox="0 0 120 200" style={`--s:${f.escala};--giro:${f.giro}deg;--d:${i * 0.18}s`}>
+            <path d="M60 200 C 58 150, 62 120, 60 92" fill="none" stroke="#4e9a4e" stroke-width="5" stroke-linecap="round" />
+            <path d="M60 155 C 34 150, 24 132, 26 122 C 44 120, 57 134, 60 155Z" fill="#5cb85c" />
+            <path d="M60 135 C 86 130, 96 112, 94 102 C 76 100, 63 114, 60 135Z" fill="#4e9a4e" />
+            <g class="corola">
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((g) => (
+                <ellipse cx="60" cy="38" rx="11" ry="25" fill="var(--amarillo)" transform={`rotate(${g} 60 68)`} />
+              ))}
+              <circle cx="60" cy="68" r="15" fill="#8a5a2b" />
+            </g>
+          </svg>
+        ))}
+      </div>
+
+      <h1 class="feliz">Feliz día de la <em>primavera</em></h1>
+      <p class="firma"><span id="r-tipo"></span>, <span id="r-de"></span></p>
+
+      <a class="btn" href="?modo=enviar">Enviar tus propias flores 🌼</a>
+    </section>
+  </main>
+
+  <footer>Desarrollado sin flores orgánicas 🌼</footer>
+</body>
+</html>
+
+<style is:global>
+  :root {
+    --amarillo: #ffd23f;
+    --amarillo-osc: #f0a500;
+    --acento: #f08a3c;
+    --tinta: #3d2b1f;
+    --papel: #fffaf0;
+  }
+  [data-tipo='amor'] { --acento: #e4572e; }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    font-family: Quicksand, system-ui, sans-serif;
+    color: var(--tinta);
+    background: linear-gradient(180deg, #8ecfff 0%, #cdeeff 35%, #ffeab3 75%, #ffd98a 100%);
+    overflow-x: hidden;
+  }
+
+  /* ----- escenario ----- */
+  .sky { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+  .sun {
+    position: absolute; top: 6vh; right: 8vw; width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, #fff3b0 35%, var(--amarillo) 70%);
+    box-shadow: 0 0 60px 20px rgba(255, 210, 63, .55);
+    animation: latir 6s ease-in-out infinite;
+  }
+  @keyframes latir { 50% { transform: scale(1.08); box-shadow: 0 0 90px 30px rgba(255,210,63,.65); } }
+
+  .clouds i {
+    position: absolute; height: 40px; border-radius: 40px; background: rgba(255,255,255,.85);
+    box-shadow: 40px 10px 0 -6px rgba(255,255,255,.85), -35px 8px 0 -8px rgba(255,255,255,.85);
+    animation: nube linear infinite;
+  }
+  .clouds i:nth-child(1) { width: 120px; top: 12vh; animation-duration: 55s; }
+  .clouds i:nth-child(2) { width: 90px;  top: 26vh; animation-duration: 75s; animation-delay: -20s; }
+  .clouds i:nth-child(3) { width: 150px; top: 5vh;  animation-duration: 95s; animation-delay: -50s; }
+  @keyframes nube { from { transform: translateX(-30vw); } to { transform: translateX(120vw); } }
+
+  .hills span {
+    position: absolute; bottom: -12vh; left: -10%; width: 120%; height: 34vh; border-radius: 50% 50% 0 0;
+    background: #7cc47c;
+  }
+  .hills span:last-child { bottom: -18vh; background: #5aa85a; height: 30vh; left: -20%; }
+
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .confetti b {
+    position: absolute; top: -8vh; font-size: 1.4rem; opacity: .9;
+    animation: caer linear infinite;
+  }
+  @keyframes caer {
+    0%   { transform: translateY(-10vh) rotate(0deg); }
+    100% { transform: translateY(110vh) rotate(540deg); }
+  }
+
+  /* ----- tarjeta ----- */
+  main { width: min(560px, 100%); z-index: 1; }
+  .card {
+    background: color-mix(in srgb, var(--papel) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border: 2px solid rgba(240, 165, 0, .25);
+    border-radius: 28px;
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    box-shadow: 0 24px 60px -20px rgba(61, 43, 31, .35);
+    text-align: center;
+    animation: entrar .8s cubic-bezier(.2, .9, .3, 1.3) both;
+  }
+  @keyframes entrar { from { opacity: 0; transform: translateY(24px) scale(.96); } }
+
+  .kicker {
+    margin: 0 0 .4rem; text-transform: uppercase; letter-spacing: .18em;
+    font-size: .72rem; font-weight: 700; color: var(--acento);
+  }
+  h1, h2 { font-family: Fraunces, Georgia, serif; font-weight: 600; margin: 0 0 .5rem; line-height: 1.05; }
+  h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  h2 { font-size: clamp(1.4rem, 5vw, 1.9rem); }
+  em { font-style: italic; color: var(--amarillo-osc); }
+  .lead { margin: 0 0 1.5rem; opacity: .75; }
+
+  /* ----- formulario ----- */
+  form { display: grid; gap: 1rem; text-align: left; }
+  label > span { display: block; font-size: .8rem; font-weight: 700; margin-bottom: .35rem; opacity: .7; }
+  input[type='text'], input:not([type]) , #link {
+    width: 100%; padding: .85rem 1rem; font: inherit; color: inherit;
+    border: 2px solid rgba(61,43,31,.15); border-radius: 14px; background: #fff;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input:focus-visible { outline: none; border-color: var(--amarillo); box-shadow: 0 0 0 4px rgba(255,210,63,.3); }
+
+  fieldset.tipos { border: 0; padding: 0; margin: 0; display: grid; gap: .6rem; }
+  legend { font-size: .8rem; font-weight: 700; opacity: .7; margin-bottom: .35rem; }
+  .tipo { display: block; cursor: pointer; }
+  .tipo input { position: absolute; opacity: 0; }
+  .tipo span {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .8rem 1rem; border: 2px solid rgba(61,43,31,.15); border-radius: 14px; background: #fff;
+    font-weight: 600; transition: all .2s;
+  }
+  .tipo input:checked + span {
+    border-color: var(--amarillo-osc); background: #fff6d6; transform: translateY(-2px);
+    box-shadow: 0 6px 0 -2px rgba(240,165,0,.35);
+  }
+  .tipo input:focus-visible + span { box-shadow: 0 0 0 4px rgba(255,210,63,.35); }
+
+  .btn {
+    display: inline-block; text-align: center; text-decoration: none; cursor: pointer;
+    padding: .9rem 1.4rem; font: inherit; font-weight: 700; color: var(--tinta);
+    background: linear-gradient(180deg, var(--amarillo), var(--amarillo-osc));
+    border: 0; border-radius: 999px; box-shadow: 0 8px 0 -2px rgba(200,130,0,.5);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 11px 0 -2px rgba(200,130,0,.5); }
+  .btn:active { transform: translateY(2px); box-shadow: 0 4px 0 -2px rgba(200,130,0,.5); }
+  .btn.mini { padding: .6rem 1rem; font-size: .85rem; }
+  .btn.ghost { background: transparent; border: 2px solid var(--amarillo-osc); box-shadow: none; }
+
+  #resultado { margin-top: 1.5rem; border-top: 2px dashed rgba(240,165,0,.35); padding-top: 1.2rem; }
+  .ok { font-weight: 700; color: var(--acento); margin: 0 0 .7rem; }
+  .linkbox { display: flex; gap: .5rem; align-items: stretch; }
+  .linkbox .btn.mini { flex: 0 0 auto; }
+  #link { font-size: 1rem; min-width: 0; text-overflow: ellipsis; }
+  .acciones { display: flex; gap: .6rem; justify-content: center; margin-top: .9rem; flex-wrap: wrap; }
+
+  /* ----- ramo ----- */
+  .ramo {
+    display: flex; align-items: flex-end; justify-content: center;
+    margin: .5rem 0; padding-top: 12%;
+  }
+  .f {
+    width: 21%; height: auto; margin: 0 -2%; max-width: 96px;
+    transform-origin: bottom center; transform: rotate(var(--giro)) scale(var(--s));
+    animation: brotar .9s cubic-bezier(.2,.9,.3,1.4) var(--d) both, mecer 4s ease-in-out calc(1s + var(--d)) infinite;
+  }
+  @keyframes brotar {
+    from { transform: rotate(var(--giro)) scale(var(--s)) scaleY(.1); opacity: 0; }
+  }
+  @keyframes mecer {
+    0%, 100% { transform: rotate(var(--giro)) scale(var(--s)); }
+    50% { transform: rotate(calc(var(--giro) + 3deg)) scale(var(--s)); }
+  }
+
+  .para span, .firma span { color: var(--acento); font-weight: 700; }
+  .feliz { margin-top: 1rem; }
+  .firma { font-size: 1.05rem; margin: .2rem 0 1.5rem; opacity: .85; }
+
+  footer { font-size: .78rem; position: relative; opacity: .55; z-index: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+
+<script>
+  const TIPOS = { carino: { texto: 'Con cariño', emoji: '🌼' }, amor: { texto: 'Con amor', emoji: '💛' } };
+  const $ = (s) => document.querySelector(s);
+  const p = new URLSearchParams(location.search);
+  const tipo = TIPOS[p.get('tipo')] ? p.get('tipo') : 'carino';
+
+  document.documentElement.dataset.tipo = tipo;
+
+  // lluvia de pétalos / corazones
+  const emoji = tipo === 'amor' ? ['💛', '🌼', '💛', '🌻'] : ['🌼', '🌻', '🌼', '🍃'];
+  const conf = $('#confetti');
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement('b');
+    b.textContent = emoji[i % emoji.length];
+    b.style.left = Math.random() * 100 + 'vw';
+    b.style.animationDuration = 8 + Math.random() * 10 + 's';
+    b.style.animationDelay = -Math.random() * 15 + 's';
+    b.style.fontSize = 0.9 + Math.random() * 1.2 + 'rem';
+    conf.append(b);
+  }
+
+  if (p.get('modo') === 'recibir') {
+    // textContent, nunca innerHTML: los params vienen de un link compartido
+    $('#r-para').textContent = p.get('para') || 'vos';
+    $('#r-de').textContent = p.get('de') || 'alguien que te quiere';
+    $('#r-tipo').textContent = TIPOS[tipo].texto;
+    $('#vista-recibir').hidden = false;
+  } else {
+    $('#vista-enviar').hidden = false;
+
+    $('#form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(e.target);
+      const q = new URLSearchParams({
+        modo: 'recibir',
+        de: d.get('de').trim(),
+        para: d.get('para').trim(),
+        tipo: d.get('tipo'),
+      });
+      const url = location.origin + location.pathname + '?' + q;
+      $('#link').value = url;
+      $('#ver').href = '?' + q;
+      $('#wsp').href =
+        'https://wa.me/?text=' +
+        encodeURIComponent(`${TIPOS[d.get('tipo')].emoji} Te mandé flores amarillas: ${url}`);
+      $('#resultado').hidden = false;
+      $('#resultado').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    $('#copiar').addEventListener('click', async () => {
+      const btn = $('#copiar');
+      try {
+        await navigator.clipboard.writeText($('#link').value);
+      } catch {
+        $('#link').select();
+        document.execCommand('copy');
+      }
+      btn.textContent = '¡Copiado!';
+      setTimeout(() => (btn.textContent = 'Copiar'), 1800);
+    });
+  }
+</script>
